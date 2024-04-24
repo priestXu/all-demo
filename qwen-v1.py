@@ -2,6 +2,7 @@
 from http import HTTPStatus
 import dashscope
 
+dashscope.api_key = 'sk-49d8f6412a3f4b46baa44ef79af5fd9f'
 
 def call_with_messages():
     messages = [{'role': 'system',

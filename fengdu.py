@@ -2,8 +2,8 @@ import csv
 from pypinyin import lazy_pinyin
 
 # 读取CSV文件
-csv_file = '/Users/xuliduo/python_workspaces/all-demo/20230721/mingshanjiedao.csv'
-output_file = '/Users/xuliduo/python_workspaces/all-demo/20230721/sql/mingshangjiedao.sql'  # 指定输出文件路径
+csv_file = '/files/20230721/mingshanjiedao.csv'
+output_file = '/files/20230721/sql/mingshangjiedao.sql'  # 指定输出文件路径
 
 with open(csv_file, newline='', encoding='utf-8') as f, open(output_file, 'w', encoding='utf-8') as output:
     reader = csv.reader(f)

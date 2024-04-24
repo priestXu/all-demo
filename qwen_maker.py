@@ -1,7 +1,7 @@
 import json
 
-input_file = "/Users/xuliduo/python_workspaces/all-demo/20230814/知识问答文本.txt"
-output_file = "/Users/xuliduo/python_workspaces/all-demo/20230814/qa.jsonl"
+input_file = "/files/20230814/知识问答文本.txt"
+output_file = "/files/20230814/qa.jsonl"
 
 with open(input_file, "r", encoding="utf-8") as infile:
     lines = infile.readlines()

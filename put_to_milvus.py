@@ -1,10 +1,9 @@
 import os
 
-from langchain_text_splitters import MarkdownHeaderTextSplitter
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Milvus
+from langchain_text_splitters import MarkdownHeaderTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pymilvus import MilvusException
 
 MILVUS_HOST = "192.168.20.201"
@@ -28,8 +27,8 @@ def read_files(path, suffix):
             # 打开文件并读取内容
             with open(filepath, 'r', encoding='utf-8') as file:
                 # 读取文件内容
-                text = file.read()
-                texts.append(text)
+                t = file.read()
+                texts.append(t)
     return texts
 
 
@@ -37,12 +36,12 @@ def read_files(path, suffix):
 # loader = DirectoryLoader('20240423', glob="**/*.md", show_progress=True)
 # docs = loader.load()
 
-docs = read_files('20240424', '.md')
+docs = read_files('files/20240424', '.md')
 
 headers_to_split_on = [
     ("#", "title"),
     ("##", "content"),
-    ("###", "Header_3"),
+    ("###", "create_time"),
 ]
 
 # 加载embeddings模型文件
@@ -50,7 +49,7 @@ embeddings = HuggingFaceBgeEmbeddings(model_name="/Users/xuliduo/tools/ai-model/
 
 total = len(docs)
 # 循环docs，将每个文档的内容转换为向量
-for i, doc in enumerate(docs, start=1):
+for i, doc in enumerate(docs, start=0):
     # 计算进度百分比
     progress = i / total * 100
     # 输出进度条
@@ -60,9 +59,10 @@ for i, doc in enumerate(docs, start=1):
     markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
     md_header_splits = markdown_splitter.split_text(doc)
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=250, chunk_overlap=30
+        chunk_size=512, chunk_overlap=30, strip_whitespace=True
     )
     news = text_splitter.split_documents(md_header_splits)
+    # print(news)
 
     try:
         # 将文档转换为向量
@@ -74,9 +74,12 @@ for i, doc in enumerate(docs, start=1):
                              "password": MILVUS_PASSWORD,
                              "database": MILVUS_DATABASE},
             collection_name=MILVUS_COLLECTION,
+            index_params={"index_type": "IVF_PQ", "nprobe": 64},
+            search_params={"topk": 20},
         )
     except MilvusException as e:
         print(f"Error: {e}")
         print(f"Failed to save document {news}")
+
 # 完成后换行
 print('\nDone!')
